@@ -1,19 +1,25 @@
 #include <iostream>
 #include "utils/logger.h"
+#include "ui/ui.h" // CLI wrapper with UI class
 
 const std::string LOG_DIR = std::string(getenv("HOME")) + "/.tanaka/logs";
 
-int main() {
-  try {
+int main(int argc, char **argv)
+{
+  try
+  {
     // Initialize logger
     tanaka::utils::Logger::init(LOG_DIR);
+    tanaka::utils::Logger::info("Starting Tanaka daemon CLI");
 
-    // Test log message
-    tanaka::utils::Logger::info("Hello world!");
+    tanaka::ui::UI::run(argc, argv);
 
     return 0;
-  } catch (const std::exception& e) {
-    std::cerr << "Failed to initialize logger: " << e.what() << std::endl;
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << "Error: " << e.what() << std::endl;
+    tanaka::utils::Logger::error(e.what());
     return 1;
   }
 }
