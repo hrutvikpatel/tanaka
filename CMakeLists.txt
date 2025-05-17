@@ -18,27 +18,22 @@ FetchContent_MakeAvailable(CLI11)
 FetchContent_Declare(
   spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
-  GIT_TAG v1.11.0  # use latest stable release
+  GIT_TAG v1.11.0
 )
 FetchContent_MakeAvailable(spdlog)
 
-# Source files
-set(SOURCES
-    main.cpp
-    ui/ui.cpp
-    utils/logger.cpp
+# Automatically find all cpp files under src/
+file(GLOB_RECURSE SOURCES
+  "${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
 
 add_executable(tanaka_daemon ${SOURCES})
 
-# Link libraries
 target_link_libraries(tanaka_daemon PRIVATE
-    spdlog::spdlog
-    CLI11::CLI11
+  spdlog::spdlog
+  CLI11::CLI11
 )
 
-# Include your own headers
 target_include_directories(tanaka_daemon PRIVATE
-    ${PROJECT_SOURCE_DIR}/cli
-    ${PROJECT_SOURCE_DIR}/utils
+  ${PROJECT_SOURCE_DIR}/include
 )

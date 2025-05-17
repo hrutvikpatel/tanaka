@@ -1,5 +1,5 @@
-brew install spdlog
 mkdir build
+cd build
 cmake ..
 make
 ./tanaka_daemon

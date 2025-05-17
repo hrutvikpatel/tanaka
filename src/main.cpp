@@ -1,6 +1,6 @@
 #include <iostream>
 #include "utils/logger.h"
-#include "ui/ui.h" // CLI wrapper with UI class
+#include "ui.h" // CLI wrapper with UI class
 
 const std::string LOG_DIR = std::string(getenv("HOME")) + "/.tanaka/logs";
 
