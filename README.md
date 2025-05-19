@@ -52,3 +52,19 @@ graph TD
     C -.-> CLI[User CLI Tool]
     D -.-> CLI
 ```
+
+
+To Build
+```
+rm -rf build
+cmake -B build -S . -DBUILD_TESTING=OFF
+cmake --build build
+```
+
+To Test
+```
+rm -rf build
+cmake -B build -S . -DBUILD_TESTING=ON
+cmake --build build
+ctest --output-on-failure
+```

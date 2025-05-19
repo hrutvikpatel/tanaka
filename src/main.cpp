@@ -12,6 +12,7 @@ int main(int argc, char **argv)
     tanaka::utils::Logger::init(LOG_DIR);
     tanaka::utils::Logger::info("Starting Tanaka daemon CLI");
 
+    tanaka::ui::UI::init();
     tanaka::ui::UI::run(argc, argv);
 
     return 0;

@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-# Fetch CLI11
 FetchContent_Declare(
   CLI11
   GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
@@ -14,7 +13,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(CLI11)
 
-# Fetch spdlog
 FetchContent_Declare(
   spdlog
   GIT_REPOSITORY https://github.com/gabime/spdlog.git
@@ -22,18 +20,25 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spdlog)
 
-# Automatically find all cpp files under src/
-file(GLOB_RECURSE SOURCES
-  "${PROJECT_SOURCE_DIR}/src/*.cpp"
+FetchContent_Declare(
+  catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG v3.4.0
 )
+FetchContent_MakeAvailable(catch2)
 
-add_executable(tanaka_daemon ${SOURCES})
+file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
-target_link_libraries(tanaka_daemon PRIVATE
-  spdlog::spdlog
-  CLI11::CLI11
-)
+add_library(tanaka_lib ${SOURCES})
 
-target_include_directories(tanaka_daemon PRIVATE
-  ${PROJECT_SOURCE_DIR}/include
-)
+target_link_libraries(tanaka_lib PUBLIC spdlog::spdlog CLI11::CLI11)
+target_include_directories(tanaka_lib PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+add_executable(tanaka_daemon src/main.cpp)
+target_link_libraries(tanaka_daemon PRIVATE tanaka_lib)
+
+# Optional tests
+option(BUILD_TESTING "Build tests" ON)
+if(BUILD_TESTING)
+  add_subdirectory(tests)
+endif()

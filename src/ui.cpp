@@ -6,16 +6,21 @@ namespace tanaka
   namespace ui
   {
 
+    // Define the static app
+    CLI::App UI::app{"Tanaka - File Backup CLI"};
+
     const std::map<std::string, std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> UI::PROVIDERS = {
         {"1", {"Digital Ocean Spaces", {{"token", "Enter your Digital Ocean API token: "}, {"region", "Enter your Space region (e.g., nyc3): "}, {"bucket", "Enter your Space bucket name: "}}}},
         {"2", {"AWS S3", {{"access_key", "Enter your AWS Access Key: "}, {"secret_key", "Enter your AWS Secret Key: "}, {"region", "Enter your AWS region (e.g., us-east-1): "}, {"bucket", "Enter your S3 bucket name: "}}}},
         {"3", {"Google Cloud Storage", {{"credentials_file", "Enter path to your GCP credentials file: "}, {"bucket", "Enter your GCS bucket name: "}}}}};
 
+    void UI::init()
+    {
+      configure_command(app);
+    }
+
     void UI::run(int argc, char **argv)
     {
-      CLI::App app{"Tanaka - File Backup CLI"};
-      configure_command(app);
-
       try
       {
         app.require_subcommand();
