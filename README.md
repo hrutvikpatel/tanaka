@@ -1,3 +1,5 @@
+![CI](https://github.com/hrutvikpatel/tanaka/actions/workflows/ci.yml/badge.svg)
+
 # tanaka
 Background daemon to backup your files to a cloud provider
 
