@@ -1,10 +1,29 @@
-file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+# Collect all .cpp test files
+file(GLOB_RECURSE TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
-add_executable(test_ui ${TEST_SOURCES})
+message(STATUS "Test sources:")
+foreach(src ${TEST_SOURCES})
+    message(STATUS "  ${src}")
+endforeach()
 
-target_link_libraries(test_ui PRIVATE Catch2::Catch2WithMain CLI11::CLI11 tanaka_lib)
-target_include_directories(test_ui PRIVATE ${CMAKE_SOURCE_DIR}/include)
+# Create the test executable
+add_executable(tests ${TEST_SOURCES})
 
-include(CTest)
+# Link libraries: Catch2 (with main), CLI11, your core lib
+target_link_libraries(tests
+  PRIVATE
+    Catch2::Catch2WithMain
+    CLI11::CLI11
+    tanaka_lib
+)
+
+# Include dirs for headers (including toml++)
+target_include_directories(tests
+  PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${tomlplusplus_SOURCE_DIR}/include
+)
+
+# Enable test discovery
 include(Catch)
-catch_discover_tests(test_ui)
+catch_discover_tests(tests)

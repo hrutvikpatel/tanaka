@@ -27,12 +27,25 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(catch2)
 
+FetchContent_Declare(
+  tomlplusplus
+  GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+  GIT_TAG v3.4.0
+)
+FetchContent_Populate(tomlplusplus)
+
+enable_testing()
+
 file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 add_library(tanaka_lib ${SOURCES})
 
 target_link_libraries(tanaka_lib PUBLIC spdlog::spdlog CLI11::CLI11)
-target_include_directories(tanaka_lib PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(tanaka_lib
+  PUBLIC 
+    ${CMAKE_SOURCE_DIR}/include
+    ${tomlplusplus_SOURCE_DIR}/include
+)
 
 add_executable(tanaka_daemon src/main.cpp)
 target_link_libraries(tanaka_daemon PRIVATE tanaka_lib)
