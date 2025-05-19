@@ -1,19 +1,25 @@
 #include <iostream>
 #include "utils/logger.h"
-#include "ui.h" // CLI wrapper with UI class
+#include "config/config.h"
 
 const std::string LOG_DIR = std::string(getenv("HOME")) + "/.tanaka/logs";
+const std::string CONFIG_FILE =std::string(getenv("HOME")) + "/.config/tanaka/config.toml";
 
 int main(int argc, char **argv)
 {
+  using namespace tanaka::utils;
+  using namespace tanaka::config;
   try
   {
     // Initialize logger
-    tanaka::utils::Logger::init(LOG_DIR);
-    tanaka::utils::Logger::info("Starting Tanaka daemon CLI");
+    Logger::init(LOG_DIR);
+    Logger::info("Starting Tanaka daemon CLI");
 
-    tanaka::ui::UI::init();
-    tanaka::ui::UI::run(argc, argv);
+    Config config;
+    config.load(CONFIG_FILE);
+
+    Logger::info("Config successfully loaded!");
+    Logger::info("Provider: {}", config.get_active_provider());
 
     return 0;
   }

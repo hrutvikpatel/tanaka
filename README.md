@@ -1,70 +1,41 @@
 ![CI](https://github.com/hrutvikpatel/tanaka/actions/workflows/ci.yml/badge.svg)
 
-# tanaka
-Background daemon to backup your files to a cloud provider
+# Tanaka
 
+**Tanaka** is a C++ daemon/CLI tool for working with cloud storage providers. It supports configurable providers like **DigitalOcean Spaces**, with pluggable configuration and rotating file-based logging.
 
-Purpose
-config/
-Load/save daemon config (S3/Spaces choice, watched paths)
-cli/
-Code for CLI commands (e.g. add, remove, status)
-core/
-Main daemon logic (startup, loop, scheduling)
-db/
-Abstracts interaction with SQLite (sync state, queue)
-storage/
-Upload code for S3 and Spaces + file compression logic
-watcher/
-Handles inotify or FSEvents/etc. to watch files
-utils/
-Generic utilities: logging, hashing (SHA256, etc.)
-data/
-Stores runtime data: config file, local DB, state files
-main.cpp
-Initializes and runs the daemon (calls into core)
+---
 
+## 📦 Configuration
 
+Before running Tanaka, create a config file:
 
-```mermaid
-graph TD
-    A[Daemon starts on boot] --> B[Load Config]
-    B -->|If config missing| C[Wait for user to run CLI]
-    C --> D[User sets config with cloud provider and paths to sync]
-    D --> E[Daemon restarts with new config]
-    
-    B --> F[Connect to SQLite DB]
-    F --> G[Check upload queue]
-    F --> H[List root paths]
-    F --> I[Get sync status]
-    F --> J[Add file hash]
-    F --> K[Add new root path]
+```bash
+mkdir ~/.config/tanaka && touch ~/.config/tanaka/config.toml
+```
 
-    A --> L[Watch root paths for changes]
-    L --> M[File added or changed]
-    M --> N[Check file type]
-    N -->|If compressible| O[Compress file]
-    N -->|If video| P[Skip compression]
+### Example contents of config.toml
 
-    O --> Q[Upload to S3 / Spaces]
-    P --> Q
+```toml
+[provider]
+active = "DigitalOcean Spaces"
 
-    Q --> R[Update SQLite: mark as synced]
-
-    C -.-> CLI[User CLI Tool]
-    D -.-> CLI
+["DigitalOcean Spaces"]
+token = "abc123"
+region = "nyc3"
+bucket = "my-bucket"
 ```
 
 
-To Build
-```
+To Build (without tests)
+```bash
 rm -rf build
 cmake -B build -S . -DBUILD_TESTING=OFF
 cmake --build build
 ```
 
 To Test
-```
+```bash
 rm -rf build
 cmake -B build -S . -DBUILD_TESTING=ON
 cmake --build build
