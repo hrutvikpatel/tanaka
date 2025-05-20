@@ -34,13 +34,21 @@ FetchContent_Declare(
 )
 FetchContent_Populate(tomlplusplus)
 
+FetchContent_Declare(
+  SQLiteCpp
+  GIT_REPOSITORY https://github.com/SRombauts/SQLiteCpp.git
+  GIT_TAG        master
+)
+
+FetchContent_MakeAvailable(SQLiteCpp)
+
 enable_testing()
 
 file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 
 add_library(tanaka_lib ${SOURCES})
 
-target_link_libraries(tanaka_lib PUBLIC spdlog::spdlog CLI11::CLI11)
+target_link_libraries(tanaka_lib PUBLIC spdlog::spdlog CLI11::CLI11 SQLiteCpp)
 target_include_directories(tanaka_lib
   PUBLIC 
     ${CMAKE_SOURCE_DIR}/include

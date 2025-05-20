@@ -1,4 +1,4 @@
-![CI](https://github.com/hrutvikpatel/tanaka/actions/workflows/ci.yml/badge.svg)
+d ![CI](https://github.com/hrutvikpatel/tanaka/actions/workflows/ci.yml/badge.svg)
 
 # Tanaka
 
@@ -39,5 +39,6 @@ To Test
 rm -rf build
 cmake -B build -S . -DBUILD_TESTING=ON
 cmake --build build
-ctest --output-on-failure
+cd build
+ctest --output-on-failure --test-dir build
 ```

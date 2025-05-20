@@ -3,7 +3,8 @@
 #include "config/config.h"
 
 const std::string LOG_DIR = std::string(getenv("HOME")) + "/.tanaka/logs";
-const std::string CONFIG_FILE =std::string(getenv("HOME")) + "/.config/tanaka/config.toml";
+const std::string CONFIG_PATH = std::string(getenv("HOME")) + "/.tanaka/config.toml";
+const std::string DB_PATH = std::string(getenv("HOME")) + "/.tanaka/data.db";
 
 int main(int argc, char **argv)
 {
@@ -16,7 +17,7 @@ int main(int argc, char **argv)
     Logger::info("Starting Tanaka daemon CLI");
 
     Config config;
-    config.load(CONFIG_FILE);
+    config.load(CONFIG_PATH);
 
     Logger::info("Config successfully loaded!");
     Logger::info("Provider: {}", config.get_active_provider());
