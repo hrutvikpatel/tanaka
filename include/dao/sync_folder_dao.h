@@ -2,6 +2,7 @@
 
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
+#include <vector>
 
 namespace tanaka::dao
 {
