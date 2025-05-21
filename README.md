@@ -39,6 +39,5 @@ To Test
 rm -rf build
 cmake -B build -S . -DBUILD_TESTING=ON
 cmake --build build
-cd build
 ctest --output-on-failure --test-dir build
 ```
