@@ -6,10 +6,10 @@
 
 namespace tanaka::dao
 {
-  class SyncFolderDao
+  class TrackedFolderDao
   {
   public:
-    explicit SyncFolderDao(SQLite::Database &db);
+    explicit TrackedFolderDao(SQLite::Database &db);
 
     void addFolder(const std::string &path);
     bool removeFolder(const std::string &path);

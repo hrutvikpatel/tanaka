@@ -1,4 +1,4 @@
-d ![CI](https://github.com/hrutvikpatel/tanaka/actions/workflows/ci.yml/badge.svg)
+![BUILD](https://github.com/hrutvikpatel/tanaka/actions/workflows/ci.yml/badge.svg)
 
 # Tanaka
 

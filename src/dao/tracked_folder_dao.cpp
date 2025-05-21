@@ -2,25 +2,25 @@
 
 namespace tanaka::dao
 {
-  SyncFolderDao::SyncFolderDao(SQLite::Database &db)
+  TrackedFolderDao::TrackedFolderDao(SQLite::Database &db)
       : m_db(db)
   {
     m_db.exec(R"(
-      CREATE TABLE IF NOT EXISTS sync_folders (
+      CREATE TABLE IF NOT EXISTS tracked_folders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         path TEXT NOT NULL UNIQUE
       );
     )");
   }
 
-  void SyncFolderDao::addFolder(const std::string &path)
+  void TrackedFolderDao::addFolder(const std::string &path)
   {
     SQLite::Statement query(m_db, "INSERT OR IGNORE INTO sync_folders (path) VALUES (?);");
     query.bind(1, path);
     query.exec();
   }
 
-  bool SyncFolderDao::removeFolder(const std::string &path)
+  bool TrackedFolderDao::removeFolder(const std::string &path)
   {
     SQLite::Statement query(m_db, "DELETE FROM sync_folders WHERE path = ?;");
     query.bind(1, path);
@@ -28,7 +28,7 @@ namespace tanaka::dao
     return rowsAffected > 0;
   }
 
-  std::vector<std::string> SyncFolderDao::getAllFolders()
+  std::vector<std::string> TrackedFolderDao::getAllFolders()
   {
     std::vector<std::string> result;
     SQLite::Statement query(m_db, "SELECT path FROM sync_folders ORDER BY path ASC;");

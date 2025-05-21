@@ -7,10 +7,10 @@
 
 using namespace tanaka::dao;
 
-TEST_CASE("SyncFolderDao can add and list folders")
+TEST_CASE("TrackedFolderDao can add and list folders")
 {
   SQLite::Database db(":memory:", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-  SyncFolderDao dao(db);
+  TrackedFolderDao dao(db);
 
   dao.addFolder("/Users/test/Documents");
   dao.addFolder("/Users/test/Downloads");
@@ -28,10 +28,10 @@ TEST_CASE("SyncFolderDao can add and list folders")
   REQUIRE(paths[1] == "/Users/test/Downloads");
 }
 
-TEST_CASE("SyncFolderDao prevents duplicate entries")
+TEST_CASE("TrackedFolderDao prevents duplicate entries")
 {
   SQLite::Database db(":memory:", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-  SyncFolderDao dao(db);
+  TrackedFolderDao dao(db);
 
   dao.addFolder("/Users/test/Documents");
   dao.addFolder("/Users/test/Documents"); // Duplicate
@@ -42,10 +42,10 @@ TEST_CASE("SyncFolderDao prevents duplicate entries")
   REQUIRE(query.getColumn(0).getInt() == 1);
 }
 
-TEST_CASE("SyncFolderDao can delete existing folder")
+TEST_CASE("TrackedFolderDao can delete existing folder")
 {
   SQLite::Database db(":memory:", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-  SyncFolderDao dao(db);
+  TrackedFolderDao dao(db);
 
   dao.addFolder("/Users/test/Documents");
   REQUIRE(dao.removeFolder("/Users/test/Documents") == true);
@@ -56,10 +56,10 @@ TEST_CASE("SyncFolderDao can delete existing folder")
   REQUIRE(query.getColumn(0).getInt() == 0); // Should be deleted
 }
 
-TEST_CASE("SyncFolderDao returns false when deleting non-existent folder")
+TEST_CASE("TrackedFolderDao returns false when deleting non-existent folder")
 {
   SQLite::Database db(":memory:", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-  SyncFolderDao dao(db);
+  TrackedFolderDao dao(db);
 
   REQUIRE(dao.removeFolder("/Users/test/Missing") == false);
 
