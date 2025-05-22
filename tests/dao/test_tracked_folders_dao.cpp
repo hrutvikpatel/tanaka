@@ -1,5 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
-#include "dao/sync_folder_dao.h"
+#include "dao/tracked_folder_dao.h"
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <vector>
 #include <string>
@@ -15,7 +15,7 @@ TEST_CASE("TrackedFolderDao can add and list folders")
   dao.addFolder("/Users/test/Documents");
   dao.addFolder("/Users/test/Downloads");
 
-  SQLite::Statement query(db, "SELECT path FROM sync_folders ORDER BY id ASC");
+  SQLite::Statement query(db, "SELECT path FROM tracked_folders ORDER BY id ASC");
 
   std::vector<std::string> paths;
   while (query.executeStep())
@@ -36,7 +36,7 @@ TEST_CASE("TrackedFolderDao prevents duplicate entries")
   dao.addFolder("/Users/test/Documents");
   dao.addFolder("/Users/test/Documents"); // Duplicate
 
-  SQLite::Statement query(db, "SELECT COUNT(*) FROM sync_folders WHERE path = ?");
+  SQLite::Statement query(db, "SELECT COUNT(*) FROM tracked_folders WHERE path = ?");
   query.bind(1, "/Users/test/Documents");
   REQUIRE(query.executeStep());
   REQUIRE(query.getColumn(0).getInt() == 1);
@@ -50,7 +50,7 @@ TEST_CASE("TrackedFolderDao can delete existing folder")
   dao.addFolder("/Users/test/Documents");
   REQUIRE(dao.removeFolder("/Users/test/Documents") == true);
 
-  SQLite::Statement query(db, "SELECT COUNT(*) FROM sync_folders WHERE path = ?");
+  SQLite::Statement query(db, "SELECT COUNT(*) FROM tracked_folders WHERE path = ?");
   query.bind(1, "/Users/test/Documents");
   REQUIRE(query.executeStep());
   REQUIRE(query.getColumn(0).getInt() == 0); // Should be deleted
@@ -64,7 +64,7 @@ TEST_CASE("TrackedFolderDao returns false when deleting non-existent folder")
   REQUIRE(dao.removeFolder("/Users/test/Missing") == false);
 
   // Optional: ensure table is still empty
-  SQLite::Statement query(db, "SELECT COUNT(*) FROM sync_folders");
+  SQLite::Statement query(db, "SELECT COUNT(*) FROM tracked_folders");
   REQUIRE(query.executeStep());
   REQUIRE(query.getColumn(0).getInt() == 0);
 }
