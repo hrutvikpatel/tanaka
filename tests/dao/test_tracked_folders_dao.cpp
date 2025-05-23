@@ -1,4 +1,4 @@
-#include <catch2/catch_test_macros.hpp>
+#include <gtest/gtest.h>
 #include "dao/tracked_folder_dao.h"
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <vector>
@@ -7,64 +7,63 @@
 
 using namespace tanaka::dao;
 
-TEST_CASE("TrackedFolderDao can add and list folders")
-{
-  SQLite::Database db(":memory:", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-  TrackedFolderDao dao(db);
+class TrackedFolderDaoTest : public ::testing::Test {
+protected:
+  SQLite::Database db{":memory:", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE};
+  TrackedFolderDao dao{db};
 
+  std::vector<std::string> getAllPaths() {
+    SQLite::Statement query(db, "SELECT path FROM tracked_folders ORDER BY id ASC");
+    std::vector<std::string> paths;
+    while (query.executeStep()) {
+      paths.push_back(query.getColumn(0).getString());
+    }
+    return paths;
+  }
+
+  int countPaths(const std::string& path) {
+    SQLite::Statement query(db, "SELECT COUNT(*) FROM tracked_folders WHERE path = ?");
+    query.bind(1, path);
+    query.executeStep();
+    return query.getColumn(0).getInt();
+  }
+
+  int countAll() {
+    SQLite::Statement query(db, "SELECT COUNT(*) FROM tracked_folders");
+    query.executeStep();
+    return query.getColumn(0).getInt();
+  }
+};
+
+TEST_F(TrackedFolderDaoTest, CanAddAndListFolders) {
   dao.addFolder("/Users/test/Documents");
   dao.addFolder("/Users/test/Downloads");
 
-  SQLite::Statement query(db, "SELECT path FROM tracked_folders ORDER BY id ASC");
+  auto paths = getAllPaths();
 
-  std::vector<std::string> paths;
-  while (query.executeStep())
-  {
-    paths.push_back(query.getColumn(0).getString());
-  }
-
-  REQUIRE(paths.size() == 2);
-  REQUIRE(paths[0] == "/Users/test/Documents");
-  REQUIRE(paths[1] == "/Users/test/Downloads");
+  EXPECT_EQ(paths.size(), 2);
+  EXPECT_EQ(paths[0], "/Users/test/Documents");
+  EXPECT_EQ(paths[1], "/Users/test/Downloads");
 }
 
-TEST_CASE("TrackedFolderDao prevents duplicate entries")
-{
-  SQLite::Database db(":memory:", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-  TrackedFolderDao dao(db);
-
+TEST_F(TrackedFolderDaoTest, PreventsDuplicateEntries) {
   dao.addFolder("/Users/test/Documents");
-  dao.addFolder("/Users/test/Documents"); // Duplicate
+  dao.addFolder("/Users/test/Documents");  // duplicate
 
-  SQLite::Statement query(db, "SELECT COUNT(*) FROM tracked_folders WHERE path = ?");
-  query.bind(1, "/Users/test/Documents");
-  REQUIRE(query.executeStep());
-  REQUIRE(query.getColumn(0).getInt() == 1);
+  EXPECT_EQ(countPaths("/Users/test/Documents"), 1);
 }
 
-TEST_CASE("TrackedFolderDao can delete existing folder")
-{
-  SQLite::Database db(":memory:", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-  TrackedFolderDao dao(db);
-
+TEST_F(TrackedFolderDaoTest, CanDeleteExistingFolder) {
   dao.addFolder("/Users/test/Documents");
-  REQUIRE(dao.removeFolder("/Users/test/Documents") == true);
 
-  SQLite::Statement query(db, "SELECT COUNT(*) FROM tracked_folders WHERE path = ?");
-  query.bind(1, "/Users/test/Documents");
-  REQUIRE(query.executeStep());
-  REQUIRE(query.getColumn(0).getInt() == 0); // Should be deleted
+  EXPECT_TRUE(dao.removeFolder("/Users/test/Documents"));
+
+  EXPECT_EQ(countPaths("/Users/test/Documents"), 0);
 }
 
-TEST_CASE("TrackedFolderDao returns false when deleting non-existent folder")
-{
-  SQLite::Database db(":memory:", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-  TrackedFolderDao dao(db);
-
-  REQUIRE(dao.removeFolder("/Users/test/Missing") == false);
+TEST_F(TrackedFolderDaoTest, ReturnsFalseWhenDeletingNonExistentFolder) {
+  EXPECT_FALSE(dao.removeFolder("/Users/test/Missing"));
 
   // Optional: ensure table is still empty
-  SQLite::Statement query(db, "SELECT COUNT(*) FROM tracked_folders");
-  REQUIRE(query.executeStep());
-  REQUIRE(query.getColumn(0).getInt() == 0);
+  EXPECT_EQ(countAll(), 0);
 }

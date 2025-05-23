@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <filesystem>
 
 namespace tanaka::dao
 {
@@ -67,7 +68,7 @@ namespace tanaka::service
      * @param path The path to check.
      * @return True if the path is tracked, false otherwise.
      */
-    bool isTracked(const std::filesystem::path& newPath) const;
+    bool isTracked(const std::filesystem::path &newPath) const;
 
   private:
     std::shared_ptr<tanaka::dao::TrackedFolderDao> m_dao;

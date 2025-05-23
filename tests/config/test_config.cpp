@@ -1,7 +1,6 @@
-#include <catch2/catch_test_macros.hpp>
+#include <gtest/gtest.h>
 #include "config/config.h"
-#include <fstream>
-#include <unistd.h> // mkstemp, close, unlink
+#include <unistd.h> // mkstemp, close, write
 #include <stdexcept>
 #include <string>
 
@@ -11,27 +10,24 @@ std::string write_temp_config(const std::string &content)
 {
   char temp_filename[] = "/tmp/config_test_XXXXXX.toml";
 
-  // mkstemps supports custom suffix like .toml (note: 5 chars = ".toml")
   int fd = mkstemps(temp_filename, 5);
   if (fd == -1)
   {
     throw std::runtime_error("Failed to create temporary file");
   }
 
-  // Write content using file descriptor
   if (write(fd, content.c_str(), content.size()) == -1)
   {
     close(fd);
     throw std::runtime_error("Failed to write to temporary file");
   }
 
-  // Close the file descriptor so that std::ifstream/Config can read it
   close(fd);
 
   return std::string(temp_filename);
 }
 
-TEST_CASE("Valid config with DigitalOcean Spaces loads corretly")
+TEST(ConfigTest, ValidConfigLoadsCorrectly)
 {
   std::string toml = R"(
     [provider]
@@ -47,13 +43,13 @@ TEST_CASE("Valid config with DigitalOcean Spaces loads corretly")
   Config config;
   config.load(path);
 
-  REQUIRE(config.get_active_provider() == "DigitalOcean Spaces");
-  REQUIRE(config.get("token") == "abc123");
-  REQUIRE(config.get("region") == "nyc3");
-  REQUIRE(config.get("bucket") == "my-bucket");
+  EXPECT_EQ(config.get_active_provider(), "DigitalOcean Spaces");
+  EXPECT_EQ(config.get("token"), "abc123");
+  EXPECT_EQ(config.get("region"), "nyc3");
+  EXPECT_EQ(config.get("bucket"), "my-bucket");
 }
 
-TEST_CASE("Missing [provider] section throws")
+TEST(ConfigTest, MissingProviderSectionThrows)
 {
   std::string toml = R"(
     ["DigitalOcean Spaces"]
@@ -64,10 +60,10 @@ TEST_CASE("Missing [provider] section throws")
 
   std::string path = write_temp_config(toml);
   Config config;
-  REQUIRE_THROWS_AS(config.load(path), ConfigError);
+  EXPECT_THROW(config.load(path), ConfigError);
 }
 
-TEST_CASE("Missing active provider field throws")
+TEST(ConfigTest, MissingActiveProviderFieldThrows)
 {
   std::string toml = R"(
     [provider]
@@ -81,10 +77,10 @@ TEST_CASE("Missing active provider field throws")
 
   std::string path = write_temp_config(toml);
   Config config;
-  REQUIRE_THROWS_AS(config.load(path), ConfigError);
+  EXPECT_THROW(config.load(path), ConfigError);
 }
 
-TEST_CASE("Missing required field throws")
+TEST(ConfigTest, MissingRequiredFieldThrows)
 {
   std::string toml = R"(
     [provider]
@@ -98,10 +94,10 @@ TEST_CASE("Missing required field throws")
 
   std::string path = write_temp_config(toml);
   Config config;
-  REQUIRE_THROWS_AS(config.load(path), ConfigError);
+  EXPECT_THROW(config.load(path), ConfigError);
 }
 
-TEST_CASE("Unsupported provider throws")
+TEST(ConfigTest, UnsupportedProviderThrows)
 {
   std::string toml = R"(
     [provider]
@@ -116,5 +112,5 @@ TEST_CASE("Unsupported provider throws")
 
   std::string path = write_temp_config(toml);
   Config config;
-  REQUIRE_THROWS_AS(config.load(path), ConfigError);
+  EXPECT_THROW(config.load(path), ConfigError);
 }

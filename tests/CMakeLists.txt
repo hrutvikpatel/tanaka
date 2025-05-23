@@ -12,9 +12,11 @@ add_executable(tests ${TEST_SOURCES})
 # Link libraries: Catch2 (with main), CLI11, your core lib
 target_link_libraries(tests
   PRIVATE
-    Catch2::Catch2WithMain
     CLI11::CLI11
     tanaka_lib
+    gtest
+    gmock
+    gtest_main
 )
 
 # Include dirs for headers (including toml++)
@@ -25,5 +27,5 @@ target_include_directories(tests
 )
 
 # Enable test discovery
-include(Catch)
-catch_discover_tests(tests)
+include(GoogleTest)
+gtest_discover_tests(tests)
